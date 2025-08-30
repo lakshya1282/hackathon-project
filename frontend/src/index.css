@@ -1,0 +1,68 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: 'Inter', system-ui, sans-serif;
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    @apply bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50;
+    background-attachment: fixed;
+    min-height: 100vh;
+  }
+  
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    @apply bg-dark-100;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    @apply bg-primary-400 rounded-full;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-primary-500;
+  }
+}
+
+@layer components {
+  .glass-morphism {
+    @apply backdrop-blur-md bg-glass-200 border border-white/20 shadow-glass;
+  }
+  
+  .gradient-text {
+    @apply bg-gradient-to-r from-primary-600 to-purple-600 bg-clip-text text-transparent;
+  }
+  
+  .floating-element {
+    animation: float 3s ease-in-out infinite;
+  }
+  
+  .glow-on-hover {
+    transition: all 0.3s ease;
+  }
+  
+  .glow-on-hover:hover {
+    @apply shadow-glow;
+    transform: translateY(-2px);
+  }
+}
+
+@layer utilities {
+  .text-shadow {
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  
+  .text-shadow-lg {
+    text-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  }
+}
