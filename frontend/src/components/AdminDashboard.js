@@ -48,15 +48,43 @@ const AdminDashboard = () => {
       )}
       <h3>Recent Pending Blogs</h3>
       <ul>
-          {recentBlogs.map(blog => {
-            const authorName = blog.author && blog.author.username ? blog.author.username : 'Unknown';
-            const authorEmail = blog.author && blog.author.email ? blog.author.email : 'Unknown';
-            return (
-              <li key={blog._id}>
-                <strong>{blog.title}</strong> by {authorName} ({authorEmail})
-              </li>
-            );
-          })}
+            {recentBlogs.map(blog => {
+              const authorName = blog.author && blog.author.username ? blog.author.username : 'Unknown';
+              const authorEmail = blog.author && blog.author.email ? blog.author.email : 'Unknown';
+              return (
+                <li key={blog._id}>
+                  <strong style={{ cursor: 'pointer', color: '#007bff' }}
+                    onClick={() => window.open(`/blog/${blog._id}`, '_blank')}
+                  >{blog.title}</strong> by {authorName} ({authorEmail})
+                  <button
+                    style={{ marginLeft: '10px', color: 'red' }}
+                    onClick={async () => {
+                      if (window.confirm('Are you sure you want to delete this blog?')) {
+                        try {
+                          const token = localStorage.getItem('token');
+                          const res = await fetch(`/admin/blogs/${blog._id}`, {
+                            method: 'DELETE',
+                            headers: {
+                              'Authorization': `Bearer ${token}`,
+                              'Content-Type': 'application/json'
+                            }
+                          });
+                          if (!res.ok) throw new Error('Failed to delete blog');
+                          setRecentBlogs(recentBlogs.filter(b => b._id !== blog._id));
+                          alert('Blog deleted successfully');
+                        } catch (err) {
+                          alert('Error deleting blog: ' + err.message);
+                        }
+                      }
+                    }}
+                  >Delete</button>
+                  <button
+                    style={{ marginLeft: '10px' }}
+                    onClick={() => window.open(`/blog/${blog._id}`, '_blank')}
+                  >View</button>
+                </li>
+              );
+            })}
       </ul>
     </div>
   );
