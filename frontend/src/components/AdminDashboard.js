@@ -54,7 +54,7 @@ const AdminDashboard = () => {
               return (
                 <li key={blog._id}>
                   <strong style={{ cursor: 'pointer', color: '#007bff' }}
-                    onClick={() => window.open(`/blog/${blog._id}`, '_blank')}
+                    onClick={() => onBlogClick && onBlogClick(blog._id)}
                   >{blog.title}</strong> by {authorName} ({authorEmail})
                   <button
                     style={{ marginLeft: '10px', color: 'red' }}

@@ -1,4 +1,7 @@
 import React, { useState, useEffect, useContext, createContext, useCallback } from 'react';
+import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
+import BlogDetailPage from './BlogDetailPage';
+import BlogDetail from './components/BlogDetail';
 import { Search, Heart, MessageCircle, Eye, User, Plus, Calendar, TrendingUp, Edit, Trash2, Check, X, Menu, Home, BookOpen, Users, BarChart3 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { GlassCard, ModernButton, ModernInput, ModernCard, StatsCard, ModernBadge, ModernSkeleton, GradientText } from './components/ModernUI';
@@ -434,6 +437,7 @@ const Header = ({ currentView, setCurrentView }) => {
 
 // Blog Card Component
 const BlogCard = ({ blog, onLike, onComment, onRefresh }) => {
+  const navigate = typeof useNavigate === 'function' ? useNavigate() : null;
   const { user } = useAuth();
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(Array.isArray(blog.likes) ? blog.likes.length : blog.likes || 0);
@@ -547,7 +551,10 @@ const BlogCard = ({ blog, onLike, onComment, onRefresh }) => {
         <p className="text-dark-600 mb-4 line-clamp-3 leading-relaxed">
           {blog.excerpt}
         </p>
-        
+        <button
+          className="px-4 py-2 mb-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 text-sm font-medium transition-colors duration-200"
+          onClick={() => navigate && navigate(`/blog/${blog._id}`)}
+        >View</button>
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-4">
             <motion.button 
@@ -603,9 +610,9 @@ const BlogCard = ({ blog, onLike, onComment, onRefresh }) => {
         <AnimatePresence>
           {showComments && (
             <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
+              initial={{ opacity: 0, blockSize: 0 }}
+              animate={{ opacity: 1, blockSize: 'auto' }}
+              exit={{ opacity: 0, blockSize: 0 }}
               transition={{ duration: 0.3 }}
               className="border-t border-gray-100 pt-4 mt-4"
             >
@@ -768,9 +775,9 @@ const LoginForm = ({ onSuccess }) => {
               <AnimatePresence>
                 {!isLogin && (
                   <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    exit={{ opacity: 0, height: 0 }}
+                    initial={{ opacity: 0, blockSize: 0 }}
+                    animate={{ opacity: 1, blockSize: 'auto' }}
+                    exit={{ opacity: 0, blockSize: 0 }}
                     transition={{ duration: 0.3 }}
                   >
                     <ModernInput
@@ -1022,6 +1029,7 @@ const HomePage = () => {
                   onLike={handleLike}
                   onComment={handleComment}
                   onRefresh={handleRefresh}
+                  onBlogClick={onBlogClick}
                 />
               </motion.div>
             ))}
@@ -1183,6 +1191,7 @@ const TrendingPage = () => {
                   onLike={handleLike}
                   onComment={handleComment}
                   onRefresh={handleRefresh}
+                  onBlogClick={onBlogClick}
                 />
               </motion.div>
             ))}
@@ -2163,6 +2172,7 @@ const AdminDashboard = () => {
 const App = () => {
   const { user } = useAuth();
   const [currentView, setCurrentView] = useState('home');
+  const [blogDetailId, setBlogDetailId] = useState(null);
 
   const handleLoginSuccess = () => {
     setCurrentView('home');
@@ -2177,21 +2187,24 @@ const App = () => {
       return <LoginForm onSuccess={handleLoginSuccess} />;
     }
 
+    if (blogDetailId) {
+      return <BlogDetail blogId={blogDetailId} />;
+    }
     switch (currentView) {
       case 'home':
-        return <HomePage />;
+        return <HomePage onBlogClick={setBlogDetailId} />;
       case 'trending':
-        return <TrendingPage />;
+        return <TrendingPage onBlogClick={setBlogDetailId} />;
       case 'create':
         return <CreateBlog onSuccess={handleBlogCreateSuccess} />;
       case 'profile':
-        return <UserProfile />;
+        return <UserProfile onBlogClick={setBlogDetailId} />;
       case 'admin':
-        return user?.role === 'admin' ? <AdminDashboard /> : <HomePage />;
+        return user?.role === 'admin' ? <AdminDashboard onBlogClick={setBlogDetailId} /> : <HomePage onBlogClick={setBlogDetailId} />;
       case 'login':
         return <LoginForm onSuccess={handleLoginSuccess} />;
       default:
-        return <HomePage />;
+        return <HomePage onBlogClick={setBlogDetailId} />;
     }
   };
 
@@ -2201,7 +2214,6 @@ const App = () => {
       <main>
         {renderCurrentView()}
       </main>
-      
       {/* Footer */}
       <footer className="bg-white border-t mt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -2209,12 +2221,12 @@ const App = () => {
             <h3 className="text-lg font-semibold text-gray-900 mb-2">DevNovate Blog Platform</h3>
             <p className="text-gray-600 mb-4">Built with MERN Stack for VIBE HACK 2025</p>
             <div className="flex justify-center space-x-6 text-sm text-gray-500">
-              <button onClick={() => setCurrentView('home')} className="hover:text-gray-700">Home</button>
-              <button onClick={() => setCurrentView('trending')} className="hover:text-gray-700">Trending</button>
+              <button onClick={() => { setCurrentView('home'); setBlogDetailId(null); }} className="hover:text-gray-700">Home</button>
+              <button onClick={() => { setCurrentView('trending'); setBlogDetailId(null); }} className="hover:text-gray-700">Trending</button>
               {user && (
                 <>
-                  <button onClick={() => setCurrentView('create')} className="hover:text-gray-700">Write</button>
-                  <button onClick={() => setCurrentView('profile')} className="hover:text-gray-700">Profile</button>
+                  <button onClick={() => { setCurrentView('create'); setBlogDetailId(null); }} className="hover:text-gray-700">Write</button>
+                  <button onClick={() => { setCurrentView('profile'); setBlogDetailId(null); }} className="hover:text-gray-700">Profile</button>
                 </>
               )}
             </div>
@@ -2229,7 +2241,12 @@ const App = () => {
 const RootApp = () => {
   return (
     <AuthProvider>
-      <App />
+      <Router>
+        <Routes>
+          <Route path="/" element={<App />} />
+          <Route path="/blog/:id" element={<BlogDetailPage />} />
+        </Routes>
+      </Router>
     </AuthProvider>
   );
 };
